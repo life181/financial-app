@@ -1,3 +1,15 @@
+// At the very top of your file (e.g., api/receipts.js or your main server file)
+require('dotenv').config();
+
+// Now you can access your environment variables like this:
+const { createClient } = require('@vercel/blob');
+const BLOB_TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
+
+// Example usage when interacting with Vercel Blob:
+const blob = createClient({ token: BLOB_TOKEN });
+
+// ... your existing API logic ...
+
 // api/receipts.js
 import { get, put } from '@vercel/blob';
 
