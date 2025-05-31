@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=794, initial-scale=1" />
+  <title>Financial Statement Generator</title>
+  <link rel="stylesheet" href="styles.css"> </head>
+<body>
+<form id="clientInfoForm" class="step active" autocomplete="off">
+  <h2>Enter Client and Date Information</h2>
+  <label for="clientName">Client Name:</label>
+  <input type="text" id="clientName" name="clientName" value="Abdi Guye Dukele" required />
+  <div class="row">
+    <div><label for="inputYear">Year (E.C):</label><input type="number" id="inputYear" name="inputYear" value="2014" required /></div>
+    <div><label for="inputMonth">Month (E.C):</label><input type="text" id="inputMonth" name="inputMonth" value="Sene" required /></div>
+    <div><label for="inputDay">Day (E.C):</label><input type="number" id="inputDay" name="inputDay" value="30" required /></div>
+  </div>
+  <button type="submit" id="toCoverPageBtn">Next</button>
+</form>
+
+<div id="coverStep" class="step">
+  <div class="step-content" style="text-align:center; position: relative;">
+    <div id="coverPreviewContainer">
+        <div id="coverPreview" style="position: relative;"></div>
+    </div>
+    <button id="toStatementsBtn">Continue to Financial Statement</button>
+  </div>
+</div>
+
+<form id="statementsForm" class="step" autocomplete="off" style="position: relative;">
+  <div class="step-content">
+    <h2>Financial Statement Data Entry</h2>
+    <h3>Income Statement</h3>
+    <label>Sales:</label><input type="text" inputmode="numeric" id="sales" value="3,999,420" />
+    <label>Other Income:</label><input type="text" inputmode="numeric" id="otherIncome" value="500,990" />
+    <label>COGS - Beginning Inventory:</label><input type="text" inputmode="numeric" id="beginningInventory" value="120,000" />
+    <label>COGS - Purchase:</label><input type="text" inputmode="numeric" id="purchase" value="2,100,000" />
+    <label>COGS - Ending Inventory:</label><input type="text" inputmode="numeric" id="endingInventory" value="210,000" />
+    <h3>Expenses</h3>
+    <label>Salary Expense:</label><input type="text" inputmode="numeric" id="salaryExpense" value="290,000" />
+    <label>Transportation Expense:</label><input type="text" inputmode="numeric" id="transportExpense" value="450,000" />
+    <label>Loading & Unloading Expense:</label><input type="text" inputmode="numeric" id="loadingExpense" value="210,000" />
+    <label>Utility Expense:</label><input type="text" inputmode="numeric" id="utilityExpense" value="61,000" />
+    <label>Repair & Maintenance Expense:</label><input type="text" inputmode="numeric" id="repairExpense" value="302,000" />
+    <label>Depreciation Expense:</label><input type="text" inputmode="numeric" id="depreciationExpense" value="310,000" />
+    <h3>Balance Sheet</h3>
+    <h4>Current Assets</h4>
+    <label>Cash at Bank:</label><input type="text" inputmode="numeric" id="cashAtBank" value="500,100" />
+    <label>Cash on Hand:</label><input type="text" inputmode="numeric" id="cashOnHand" value="500,500" />
+    <label>Stock:</label><input type="text" inputmode="numeric" id="stock" value="1,100,000" />
+    <label>Prepayment:</label><input type="text" inputmode="numeric" id="prepayment" value="0" />
+    <label>Account Receivable:</label><input type="text" inputmode="numeric" id="accountReceivable" value="400,000" />
+    <h4>Fixed Assets</h4>
+    <div id="fixedAssetsSection"></div>
+    <button type="button" id="addAssetBtn" style="margin-bottom:10px;">Add Fixed Asset</button>
+    <label>Accumulated Depreciation:</label><input type="text" inputmode="numeric" id="accumulatedDepreciation" value="310,000" />
+    <h4>Liabilities</h4>
+    <label>Profit Tax Payable:</label><input type="text" inputmode="numeric" id="profitTaxPayable" value="240,719" />
+    <label>Bank Loan:</label><input type="text" inputmode="numeric" id="bankLoan" value="0" />
+    <h4>Capital</h4>
+    <label for="capitalReserves">Capital / Initial Investment:</label><input type="text" inputmode="numeric" id="capitalReserves" value="1,940,394" />
+    <label for="retainedEarnings">Retained Earnings (Beginning):</label><input type="text" inputmode="numeric" id="retainedEarnings" value="510,000" />
+    <label for="profitOfYearDisplay">Profit of the Year (Calculated):</label><input type="text" id="profitOfYearDisplay" readonly />
+    <label for="totalCapitalDisplay">Total Capital (Calculated):</label><input type="text" id="totalCapitalDisplay" readonly />
+
+    <button type="button" id="previewPdfBtn">Preview PDF</button>
+
+    <p class="multi-year-note">
+      Click "Download PDF" or "Print PDF" to get the first year's report.<br>
+      Notice the Year field automatically increments.<br>
+      Enter new data for the "next year" and repeat the download two more times.<br>
+      After the third download, the buttons will disable again.
+    </p>
+
+    <div class="payment-section" aria-label="Payment for download section">
+      <h3>Payment for Download</h3>
+      <p class="payment-instructions">
+        Please pay 10,000 ETB to the bank account below:<br />
+        Bank: Commercial Bank of Ethiopia (CBE)<br />
+        Account Number: 1234567890<br />
+        After payment, upload your payment receipt below for approval.
+      </p>
+      <label for="phoneNumber">Phone Number:</label>
+      <input type="tel" id="phoneNumber" placeholder="+251 9XXXXXXXX" pattern="^\+?\d{7,15}$" title="Enter valid phone number" required />
+      <label for="receiptUpload" class="file-upload-label">Upload Payment Receipt:</label>
+      <input type="file" id="receiptUpload" accept="image/*,application/pdf" />
+      <button type="button" id="submitReceiptBtn" disabled>Submit Receipt for Approval</button>
+      <p id="paymentStatusMessage" aria-live="polite"></p>
+      <br/>
+      <button type="button" id="downloadPdfBtn" disabled>Download PDF</button>
+      <button type="button" id="printPdfBtn" disabled>Print PDF</button>
+    </div>
+  </div>
+
+  <main id="reportPreview" aria-label="Financial Statement Preview" style="margin-top: 30px; max-height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 12px; border-radius: 8px; background: #fff;"></main>
+</form>
+
+<img src="digital seal.png" alt="Digital Seal" id="digitalSealImagePreload" style="visibility:hidden; width:1px; height:1px; position:absolute; top:-999px;">
+<img src="Trade License.png" alt="Trade License" id="tradeLicenseImagePreload" style="visibility:hidden; width:1px; height:1px; position:absolute; top:-999px;">
+<img src="Tin Number.png" alt="TIN Number" id="tinNumberImagePreload" style="visibility:hidden; width:1px; height:1px; position:absolute; top:-999px;">
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script>
+// --- Utility ---
+function formatNumber(num) {
+  if (num === null || num === undefined || isNaN(num) || num === '') return '';
+  const n = Number(num); const absNum = Math.abs(n);
+  const formatted = absNum.toLocaleString('en-US', {maximumFractionDigits: 0});
+  return n < 0 ? `(${formatted})` : formatted;
+}
+function parseNumber(str) {
+  if (!str) return 0;
+  return Number(String(str).replace(/,/g,'').replace(/[()]/g,'').trim()) * (String(str).includes('(') ? -1 : 1);
+}
+function toCommaString(val) {
+  if(val===''||val===null||val===undefined) return '';
+  val = String(val).replace(/,/g,''); if(isNaN(val)) return '';
+  return Number(val).toLocaleString('en-US', {maximumFractionDigits: 0});
+}
+function showStep(idx){
+  document.querySelectorAll('.step').forEach((el,i) => el.classList.toggle('active',i===idx));
+  const reportPreviewEl = document.getElementById('reportPreview');
+  const coverPreviewContainerEl = document.getElementById('coverPreviewContainer');
+  if(idx === 0) {
+    reportPreviewEl.style.display='none';
+    coverPreviewContainerEl.style.display = 'none';
+  } else if(idx === 1){
+    reportPreviewEl.style.display='none';
+    coverPreviewContainerEl.style.display = 'block';
+  } else if(idx === 2) {
+    reportPreviewEl.style.display='block';
+    coverPreviewContainerEl.style.display = 'none';
+    renderReportDOM(true,false);
+  }
+}
+
+// --- Fixed Assets ---
+let fixedAssets = [
+  { name: "House", value: "1,200,000"}, { name: "Equipment and Machinery", value: "500,100"},
+  { name: "Building", value: "800,000"}, { name: "Vehicle", value: "1,999,200"}
+];
+function renderFixedAssetsInputs(){
+  const div = document.getElementById('fixedAssetsSection'); div.innerHTML = '';
+  fixedAssets.forEach((asset,i) => {
+    const row = document.createElement('div');
+    row.style.cssText='display:flex; gap:10px; margin-bottom:7px;';
+    const nameInput = document.createElement('input'); nameInput.type = 'text'; nameInput.value = asset.name; nameInput.style.flex='2';
+    nameInput.oninput = ()=>{ asset.name = nameInput.value; if (document.getElementById('statementsForm').classList.contains('active')) renderReportDOM(true,false); };
+    const valueInput = document.createElement('input'); valueInput.type = 'text'; inputMode="numeric"; valueInput.value = asset.value; valueInput.style.flex='1.5';
+    valueInput.oninput = ()=>{
+      const cursorPos = valueInput.selectionStart; const originalLength = valueInput.value.length;
+      valueInput.value = toCommaString(valueInput.value);
+      const newLength = valueInput.value.length;
+      valueInput.selectionStart = valueInput.selectionEnd = cursorPos + (newLength - originalLength);
+      asset.value = valueInput.value; if (document.getElementById('statementsForm').classList.contains('active')) renderReportDOM(true,false);
+    };
+    row.appendChild(nameInput); row.appendChild(valueInput);
+    if(i>=4){
+      const removeBtn = document.createElement('button'); removeBtn.type = 'button'; removeBtn.className = 'remove-asset-btn'; removeBtn.innerHTML = '❌';
+      removeBtn.onclick = ()=>{ fixedAssets.splice(i,1); renderFixedAssetsInputs(); if (document.getElementById('statementsForm').classList.contains('active')) renderReportDOM(true,false); };
+      row.appendChild(removeBtn);
+    }
+    div.appendChild(row);
+  });
+}
+function attachCommaInputEvents(formId){
+  document.querySelectorAll(`#${formId} input[type="text"][inputmode="numeric"]`).forEach(inp=>{
+    inp.oninput = (e)=>{
+      const cursorPos = inp.selectionStart; const originalLength = inp.value.length;
+      inp.value = toCommaString(inp.value);
+      const newLength = inp.value.length;
+      inp.selectionStart = inp.selectionEnd = cursorPos + (newLength - originalLength);
+      if (document.getElementById('statementsForm').classList.contains('active') && !e.target.closest('.fixed-asset-row')) renderReportDOM(true,false);
+    };
+    inp.onblur = ()=>{ inp.value = toCommaString(inp.value); };
+  });
+}
+document.getElementById('clientInfoForm').onsubmit = (e)=>{
+  e.preventDefault();
+  const clientName = document.getElementById('clientName').value.trim()||'Client Name';
+  const dateStr = `${document.getElementById('inputMonth').value.trim()||'Month'} ${document.getElementById('inputDay').value.trim()||'--'}, ${document.getElementById('inputYear').value.trim()||'----'}`;
+  document.getElementById('coverPreview').innerHTML = '';
+  document.getElementById('coverPreview').appendChild(buildCoverPage(clientName, dateStr));
+  showStep(1);
+};
+document.getElementById('toStatementsBtn').onclick = ()=>showStep(2);
+
+// Seal at bottom center helper
+function addSealToPage(div) {
+  const sealImg = getLoadedImageElement('digitalSeal');
+  sealImg.className = 'digital-seal';
+  sealImg.style.position = 'absolute';
+  sealImg.style.left = '50%';
+  sealImg.style.transform = 'translateX(-50%)';
+  sealImg.style.bottom = '30px';
+  sealImg.style.display = 'block';
+  sealImg.style.width = '100px';
+  sealImg.style.height = '100px';
+  sealImg.style.zIndex = 10;
+  div.appendChild(sealImg);
+}
+
+function buildCoverPage(clientName, dateStr) {
+  const div = document.createElement('div'); div.className = 'cover-page';
+  div.style.position = 'relative';
+  div.style.minHeight = '1050px';
+  const h1 = document.createElement('h1'); h1.textContent = 'Provisional Financial Report'; div.appendChild(h1);
+  const h2 = document.createElement('h2'); h2.textContent = clientName; div.appendChild(h2);
+  const p = document.createElement('p'); p.textContent = `Prepared as of ${dateStr} E.C.`; div.appendChild(p);
+  const footer = document.createElement('div'); footer.className = 'page-footer'; footer.innerHTML = 'Page <span class="page-number">1</span>'; div.appendChild(footer);
+  addSealToPage(div);
+  return div;
+}
+function createRow(label, value, isSectionHeader, isSubtotal, indent = 0, isCalculated = false) {
+  const tr = document.createElement('tr');
+  if (isSectionHeader) tr.classList.add('section-header');
+  if (isSubtotal) tr.classList.add('subtotal');
+  if (isCalculated) tr.classList.add('calculated');
+  const tdLabel = document.createElement('td'); tdLabel.className = 'label';
+  if (indent) tdLabel.classList.add('indent-1'); tdLabel.textContent = label;
+  const tdAmount = document.createElement('td'); tdAmount.className = 'amount';
+  tdAmount.textContent = (value !== undefined && value !== null && value !== '') ? formatNumber(value) : '';
+  tr.appendChild(tdLabel); tr.appendChild(tdAmount); return tr;
+}
+function buildFinancialStatementPage(data, clientName, dateStr, pageNum) {
+  const page = document.createElement('div'); page.className = 'page';
+  page.style.position = 'relative';
+  page.style.minHeight = '1050px';
+  const header = document.createElement('div'); header.className = 'page-header'; header.textContent = `${clientName} | Financial Statement | ${dateStr} E.C.`; page.appendChild(header);
+  const footer = document.createElement('div'); footer.className = 'page-footer'; footer.innerHTML = `Page <span class="page-number">2</span>`; page.appendChild(footer);
+  const h1 = document.createElement('h1'); h1.textContent = 'Provisional Financial Statement'; page.appendChild(h1);
+  const h2 = document.createElement('h2'); h2.textContent = `As of ${dateStr} E.C.`; page.appendChild(h2);
+  const table = document.createElement('table');
+  table.appendChild(createRow('Sales', data.sales)); table.appendChild(createRow('Other income', data.otherIncome));
+  table.appendChild(createRow('Total sales', data.totalSales, false, true, 0, true));
+  table.appendChild(createRow('Cost of goods sold', '', true));
+  table.appendChild(createRow('Beginning inventory', data.beginningInventory, false, false, 1));
+  table.appendChild(createRow('Add: purchase', data.purchase, false, false, 1));
+  table.appendChild(createRow('Inventory available for sale', data.inventoryAvailable, false, false, 1, true));
+  table.appendChild(createRow('Less: Ending inventory', data.endingInventory, false, false, 1));
+  table.appendChild(createRow('Total cost of goods sold', data.totalCOGS, false, true, 0, true));
+  table.appendChild(createRow('Gross profit', data.grossProfit, false, true, 0, true));
+  table.appendChild(createRow('Expense', '', true));
+  table.appendChild(createRow('Salary expense', data.salaryExpense, false, false, 1));
+  table.appendChild(createRow('Transportation expense', data.transportExpense, false, false, 1));
+  table.appendChild(createRow('Loading & Unloading expense', data.loadingExpense, false, false, 1));
+  table.appendChild(createRow('Utility expense', data.utilityExpense, false, false, 1));
+  table.appendChild(createRow('Repair & Maintenance expense', data.repairExpense, false, false, 1));
+  table.appendChild(createRow('Depreciation expense', data.depreciationExpense, false, false, 1));
+  table.appendChild(createRow('Total expense', data.totalExpense, false, true, 0, true));
+  table.appendChild(createRow('Net profit before Tax', data.netProfitBeforeTax, false, true, 0, true));
+  table.appendChild(createRow('Profit tax', data.profitTaxPayable));
+  table.appendChild(createRow('Net income after tax', data.netIncomeAfterTax, false, true, 0, true));
+  page.appendChild(table);
+  addSealToPage(page);
+  return page;
+}
+function buildBalanceSheetPage(data, clientName, dateStr, pageNum, assetsArr) {
+  const page = document.createElement('div'); page.className = 'page';
+  page.style.position = 'relative';
+  page.style.minHeight = '1050px';
+  const header = document.createElement('div'); header.className = 'page-header'; header.textContent = `${clientName} | Balance Sheet | ${dateStr} E.C.`; page.appendChild(header);
+  const footer = document.createElement('div'); footer.className = 'page-footer'; footer.innerHTML = `Page <span class="page-number">3</span>`; page.appendChild(footer);
+  const h1 = document.createElement('h1'); h1.textContent = 'Balance Sheet'; page.appendChild(h1);
+  const h2 = document.createElement('h2'); h2.textContent = `As of ${dateStr} E.C.`; page.appendChild(h2);
+  const table = document.createElement('table');
+  table.appendChild(createRow('Current Asset', '', true));
+  table.appendChild(createRow('Cash at bank', data.cashAtBank, false, false, 1)); table.appendChild(createRow('Cash on hand', data.cashOnHand, false, false, 1));
+  table.appendChild(createRow('Stock', data.stock, false, false, 1)); table.appendChild(createRow('Prepayment', data.prepayment, false, false, 1));
+  table.appendChild(createRow('Account receivable', data.accountReceivable, false, false, 1));
+  table.appendChild(createRow('Total current asset', data.totalCurrentAssets, false, true, 0, true));
+  table.appendChild(createRow('Fixed Asset', '', true));
+  let sumPositiveFixedAssets = 0;
+  assetsArr.forEach(asset => { sumPositiveFixedAssets += asset.value; table.appendChild(createRow(asset.name, asset.value, false, false, 1)); });
+  table.appendChild(createRow('Accumulated depreciation', data.accumulatedDepreciation, false, false, 1));
+  const netFixedAssets = sumPositiveFixedAssets - data.accumulatedDepreciation;
+  table.appendChild(createRow('Total Fixed Asset (Net)', netFixedAssets, false, true, 0, true));
+  const totalAssets = data.totalCurrentAssets + netFixedAssets;
+  table.appendChild(createRow('Total Assets', totalAssets, false, true, 0, true));
+  table.appendChild(createRow('Liabilities', '', true));
+  table.appendChild(createRow('Profit tax payable', data.profitTaxPayable, false, false, 1));
+  table.appendChild(createRow('Bank loan', data.bankLoan, false, false, 1));
+  const totalLiabilities = data.profitTaxPayable + data.bankLoan;
+  table.appendChild(createRow('Total Liabilities', totalLiabilities, false, true, 0, true));
+  table.appendChild(createRow('Capital', '', true));
+  table.appendChild(createRow('Capital / Initial Investment', data.capitalReserves, false, false, 1));
+  table.appendChild(createRow('Retained Earnings (Beginning)', data.retainedEarnings, false, false, 1));
+  table.appendChild(createRow('Profit of the year', data.profitOfYear, false, false, 1, true));
+  table.appendChild(createRow('Total Capital', data.totalCapital, false, true, 0, true));
+  const totalLiabilitiesAndCapital = totalLiabilities + data.totalCapital;
+  table.appendChild(createRow('Total Liabilities & Capital', totalLiabilitiesAndCapital, false, true, 0, true));
+  page.appendChild(table);
+  addSealToPage(page);
+  return page;
+}
+
+// --- Image page with watermark (loads image properly) ---
+function buildImagePageWithWatermark(title, clientName, which) {
+  const page = document.createElement('div');
+  page.className = 'page';
+  page.style.position = 'relative';
+  page.style.overflow = 'hidden';
+  page.style.minHeight = '1050px';
+  // Insert background image
+  const img = getLoadedImageElement(which);
+  img.style.position = 'absolute';
+  img.style.top = '0';
+  img.style.left = '0';
+  img.style.width = '100%';
+  img.style.height = '100%';
+  img.style.objectFit = 'contain';
+  img.style.zIndex = '0';
+  page.appendChild(img);
+  // Watermark
+  const watermark = document.createElement('div');
+  watermark.className = 'watermark-text';
+  watermark.textContent = `This is only for '${clientName}'`;
+  page.appendChild(watermark);
+  // Digital Seal at bottom center
+  addSealToPage(page);
+  // Footer
+  const footer = document.createElement('div');
+  footer.className = 'page-footer';
+  footer.style.position = 'absolute';
+  footer.style.bottom = '18px';
+  footer.style.left = '60px';
+  footer.style.right = '40px';
+  footer.style.fontSize = '9pt';
+  footer.style.color = '#333';
+  footer.style.textAlign = 'center';
+  footer.innerHTML = `Page <span class="page-number">${title==='Trade License'?4:5}</span>`;
+  page.appendChild(footer);
+  return page;
+}
+
+// --- Load images as Image objects and keep in global map
+const loadedImages = {};
+function getLoadedImageElement(which) {
+  // which: digitalSeal, tradeLicense, tinNumber
+  let srcId = '';
+  if (which==='digitalSeal') srcId = 'digitalSealImagePreload';
+  if (which==='tradeLicense') srcId = 'TradeLicenseImagePreload'; // Corrected ID
+  if (which==='tinNumber') srcId = 'tinNumberImagePreload';
+  if (!srcId || !document.getElementById(srcId)) return document.createElement('span');
+  if (!loadedImages[which]) {
+    const baseImg = document.getElementById(srcId);
+    const img = new window.Image();
+    img.src = baseImg.src;
+    img.alt = baseImg.alt;
+    loadedImages[which] = img;
+  }
+  // Always return a fresh clone so DOM doesn't share the same node!
+  const clone = loadedImages[which].cloneNode();
+  clone.style.display = 'block';
+  return clone;
+}
+
+// --- Data entry
+function getStatementDataAndCalc() {
+  function val(id){ return parseNumber(document.getElementById(id).value);}
+  let parsedFixedAssets = fixedAssets.map(asset=>({ name: asset.name, value: parseNumber(asset.value) }));
+  const baseData = {
+    sales: val('sales'), otherIncome: val('otherIncome'), beginningInventory: val('beginningInventory'), purchase: val('purchase'), endingInventory: val('endingInventory'),
+    salaryExpense: val('salaryExpense'), transportExpense: val('transportExpense'), loadingExpense: val('loadingExpense'), utilityExpense: val('utilityExpense'), repairExpense: val('repairExpense'), depreciationExpense: val('depreciationExpense'),
+    cashAtBank: val('cashAtBank'), cashOnHand: val('cashOnHand'), stock: val('stock'), prepayment: val('prepayment'), accountReceivable: val('accountReceivable'),
+    assetsArr: parsedFixedAssets, accumulatedDepreciation: Math.abs(val('accumulatedDepreciation')), profitTaxPayable: val('profitTaxPayable'), bankLoan: val('bankLoan'),
+    capitalReserves: val('capitalReserves'), retainedEarnings: val('retainedEarnings')
+  };
+  const totalSales = baseData.sales + baseData.otherIncome;
+  const inventoryAvailable = baseData.beginningInventory + baseData.purchase;
+  const totalCOGS = inventoryAvailable - baseData.endingInventory;
+  const grossProfit = totalSales - totalCOGS;
+  const totalExpense = baseData.salaryExpense + baseData.transportExpense + baseData.loadingExpense + baseData.utilityExpense + baseData.repairExpense + baseData.depreciationExpense;
+  const netProfitBeforeTax = grossProfit - totalExpense;
+  const netIncomeAfterTax = netProfitBeforeTax - baseData.profitTaxPayable;
+  document.getElementById('profitOfYearDisplay').value = formatNumber(netIncomeAfterTax);
+  const totalCapitalCalculated = baseData.capitalReserves + baseData.retainedEarnings + netIncomeAfterTax;
+  document.getElementById('totalCapitalDisplay').value = formatNumber(totalCapitalCalculated);
+  const totalCurrentAssets = baseData.cashAtBank + baseData.cashOnHand + baseData.stock + baseData.prepayment + baseData.accountReceivable;
+  return { ...baseData, totalSales, inventoryAvailable, totalCOGS, grossProfit, totalExpense, netProfitBeforeTax, netIncomeAfterTax, profitOfYear: netIncomeAfterTax, totalCapital: totalCapitalCalculated, totalCurrentAssets };
+}
+
+// --- PDF Caching ---
+let cachedPdfBlob = null;
+let cachedPdfUrl = null;
+let pdfCacheIsValid = false;
+
+// --- PDF Generation and Preview ---
+async function generateAndCachePDF() {
+  if (pdfCacheIsValid && cachedPdfBlob) return;
+  const reportData = getStatementDataAndCalc();
+  const clientName = document.getElementById('clientName').value.trim()||'Client Name';
+  const dateStr = `${document.getElementById('inputMonth').value.trim()||'Month'} ${document.getElementById('inputDay').value.trim()||'--'}, ${document.getElementById('inputYear').value.trim()||'----'}`;
+
+  const cover = buildCoverPage(clientName, dateStr);
+  const statement = buildFinancialStatementPage(reportData, clientName, dateStr, 2);
+  const balance = buildBalanceSheetPage(reportData, clientName, dateStr, 3, reportData.assetsArr);
+
+  await waitForAllImagesLoaded();
+
+  const tradeLicensePage = buildImagePageWithWatermark('Trade License', clientName, 'tradeLicense');
+  const tinNumberPage = buildImagePageWithWatermark('TIN Number', clientName, 'tinNumber');
+
+  const container = document.createElement('div');
+  container.style.position = 'fixed';
+  container.style.left = '-9999px';
+  container.style.top = '0';
+  container.style.zIndex = '9999';
+  container.style.background = 'white';
+
+  [cover, statement, balance, tradeLicensePage, tinNumberPage].forEach(pg => container.appendChild(pg));
+  document.body.appendChild(container);
+
+  await new Promise(r=>setTimeout(r,120));
+
+  const pageDivs = [cover, statement, balance, tradeLicensePage, tinNumberPage];
+  const images = [];
+  for(let i=0; i<pageDivs.length; ++i){
+    let canvas = await html2canvas(pageDivs[i], {
+      scale: 2,
+      backgroundColor: '#fff',
+      width: 794,
+      height: 1123,
+      useCORS: true
+    });
+    images.push(canvas.toDataURL("image/jpeg", 1.0));
+  }
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({
+    unit: 'pt',
+    format: [595.28, 841.89],
+    orientation: 'portrait'
+  });
+  for(let i=0; i<images.length; ++i){
+    if(i>0) pdf.addPage();
+    pdf.addImage(images[i], 'JPEG', 0, 0, 595.28, 841.89);
+  }
+
+  // Store as blob for download/print
+  cachedPdfBlob = pdf.output('blob');
+  pdfCacheIsValid = true;
+
+  if (cachedPdfUrl) {
+    URL.revokeObjectURL(cachedPdfUrl);
+    cachedPdfUrl = null;
+  }
+  cachedPdfUrl = URL.createObjectURL(cachedPdfBlob);
+
+  document.body.removeChild(container);
+}
+
+function renderReportDOM(forPreview, renderAllPages = false){
+  const reportData = getStatementDataAndCalc();
+  const clientName = document.getElementById('clientName').value.trim()||'Client Name';
+  const dateStr = `${document.getElementById('inputMonth').value.trim()||'Month'} ${document.getElementById('inputDay').value.trim()||'--'}, ${document.getElementById('inputYear').value.trim()||'----'}`;
+  if(forPreview){
+    const container = document.getElementById('reportPreview');
+    container.innerHTML = '';
+    container.appendChild(buildCoverPage(clientName,dateStr));
+    container.appendChild(buildFinancialStatementPage(reportData,clientName,dateStr,2));
+    container.appendChild(buildBalanceSheetPage(reportData,clientName,dateStr,3, reportData.assetsArr));
+    if(renderAllPages){
+      container.appendChild(buildImagePageWithWatermark('Trade License', clientName, 'tradeLicense'));
+      container.appendChild(buildImagePageWithWatermark('TIN Number', clientName, 'tinNumber'));
+    }
+  }
+  pdfCacheIsValid = false;
+  if (cachedPdfUrl) {
+    URL.revokeObjectURL(cachedPdfUrl);
+    cachedPdfUrl = null;
+  }
+  cachedPdfBlob = null;
+}
+
+// Utility: Wait for loadedImages to load
+function waitForAllImagesLoaded() {
+  const promises = [];
+  ['digitalSeal','tradeLicense','tinNumber'].forEach(which=>{
+    if (!loadedImages[which]) getLoadedImageElement(which);
+    const img = loadedImages[which];
+    if (!img || img.complete) return;
+    promises.push(new Promise(res=>{
+      img.onload=()=>res(); img.onerror=()=>res();
+    }));
+  });
+  return Promise.all(promises);
+}
+
+// --- Form events, payment, and admin prototype logic ---
+document.getElementById('statementsForm').oninput = (e)=>{
+  if (e.target.closest('.fixed-asset-row')) return;
+  renderReportDOM(true,false);
+};
+
+document.addEventListener('DOMContentLoaded', async () => { // Made async
+  attachCommaInputEvents('statementsForm');
+  renderFixedAssetsInputs();
+  getStatementDataAndCalc();
+  showStep(0); // This ensures the first step is shown initially
+
+  // Payment logic
+  const receiptInput = document.getElementById('receiptUpload');
+  const phoneInput = document.getElementById('phoneNumber');
+  const submitReceiptBtn = document.getElementById('submitReceiptBtn');
+
+  function validateSubmitButton() {
+    const phoneValid = phoneInput.checkValidity();
+    const fileSelected = receiptInput.files.length > 0;
+    submitReceiptBtn.disabled = !(phoneValid && fileSelected);
+  }
+
+  phoneInput.addEventListener('input', validateSubmitButton);
+  receiptInput.addEventListener('change', validateSubmitButton);
+
+  updatePaymentStatus('');
+
+  // No more window.mockReceipts - data comes from API
+
+  // Helper to enable/disable download and print based on approval status for current client
+  function disableDownloadPrintButtons() {
+    document.getElementById('downloadPdfBtn').disabled = true;
+    document.getElementById('printPdfBtn').disabled = true;
+  }
+  function enableDownloadPrintButtons() {
+    document.getElementById('downloadPdfBtn').disabled = false;
+    document.getElementById('printPdfBtn').disabled = false;
+  }
+
+  async function updateDownloadPrintButtonsState() {
+    const clientName = document.getElementById('clientName').value.trim();
+    if (!clientName) {
+      disableDownloadPrintButtons();
+      window.paymentApproved = false; // Global state for client-side use
+      updatePaymentStatus('No client name entered.');
+      return;
+    }
+
+    try {
+      // 1. Check payment approval status
+      const receiptsResponse = await fetch('/api/receipts');
+      const allReceipts = await receiptsResponse.json();
+      const approvedExists = allReceipts.some(r =>
+        r.client_name === clientName && r.status === 'approved'
+      );
+      window.paymentApproved = approvedExists;
+
+      // 2. Check download count
+      const downloadCountsResponse = await fetch(`/api/client-downloads?clientName=${encodeURIComponent(clientName)}`);
+      const clientDownloadData = await downloadCountsResponse.json();
+      const currentDownloads = clientDownloadData.downloads || 0;
+      const MAX_DOWNLOADS = 3; // Define max downloads
+
+      if (approvedExists && currentDownloads < MAX_DOWNLOADS) {
+        enableDownloadPrintButtons();
+        updatePaymentStatus('Payment approved for this client. ' + (MAX_DOWNLOADS - currentDownloads) + ' downloads remaining.');
+      } else {
+        disableDownloadPrintButtons();
+        if (currentDownloads >= MAX_DOWNLOADS) {
+          updatePaymentStatus('Maximum downloads reached for this client. Please contact support to enable more downloads.');
+        } else if (!approvedExists) {
+          updatePaymentStatus('No approved payment found for this client.');
+        }
+      }
+    } catch (error) {
+      console.error("Error updating download/print button state:", error);
+      updatePaymentStatus('Error checking payment/download status.');
+      disableDownloadPrintButtons();
+    }
+  }
+
+  submitReceiptBtn.addEventListener('click', async () => { // Made async
+    if (!receiptInput.files.length) return;
+    if (!phoneInput.checkValidity()) {
+      updatePaymentStatus('Please enter a valid phone number before submitting.');
+      return;
+    }
+    updatePaymentStatus('Submitting receipt for approval...');
+    submitReceiptBtn.disabled = true;
+    receiptInput.disabled = true;
+    phoneInput.disabled = true;
+
+    const clientName = document.getElementById('clientName').value.trim() || 'Client Name';
+    const file = receiptInput.files[0];
+    const fileName = file.name; // In a real app, you'd upload the file to Blob storage too.
+
+    try {
+        const response = await fetch('/api/receipts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                client_name: clientName,
+                filename: fileName,
+                phone: phoneInput.value.trim(),
+            }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            updatePaymentStatus('Receipt submitted. Waiting for admin approval...');
+            receiptInput.value = ''; // Clear file input
+            phoneInput.value = '';
+        } else {
+            const errorData = await response.json();
+            updatePaymentStatus(`Error submitting receipt: ${errorData.message}`);
+        }
+    } catch (error) {
+        console.error("Error submitting receipt:", error);
+        updatePaymentStatus('Network error or failed to submit receipt.');
+    } finally {
+        receiptInput.disabled = false;
+        phoneInput.disabled = false;
+        submitReceiptBtn.disabled = true; // Re-disable if no file is selected initially
+        updateDownloadPrintButtonsState();
+    }
+  });
+
+  // Preview PDF button logic — fix here: render all pages in preview
+  document.getElementById('previewPdfBtn').addEventListener('click', async () => {
+    renderReportDOM(true, true); // <-- changed false to true to include pages 4 & 5
+    // No longer dependent on window.paymentApproved here, only for actual download/print
+  });
+
+  // Download and Print buttons logic with max downloads
+  const downloadBtn = document.getElementById('downloadPdfBtn');
+  const printBtn = document.getElementById('printPdfBtn');
+  const MAX_DOWNLOADS = 3; // Re-define here for clarity
+
+  async function incrementDownloadCountAPI(clientName) {
+      try {
+          const response = await fetch('/api/increment-download', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ clientName }),
+          });
+          if (!response.ok) {
+              const errorData = await response.json();
+              console.error('Failed to increment download count on backend:', errorData.message);
+              alert('Failed to update download count. Please try again.');
+          }
+      } catch (error) {
+          console.error('Network error during download count increment:', error);
+          alert('Network error during download count update.');
+      }
+  }
+
+  downloadBtn.addEventListener('click', async () => {
+    const clientName = document.getElementById('clientName').value.trim();
+    if (!clientName) {
+      alert('Please enter a client name.');
+      return;
+    }
+
+    try {
+        const downloadCountsResponse = await fetch(`/api/client-downloads?clientName=${encodeURIComponent(clientName)}`);
+        const clientData = await downloadCountsResponse.json();
+        const currentDownloads = clientData.downloads || 0;
+
+        if (currentDownloads >= MAX_DOWNLOADS) {
+            alert('Maximum download limit reached for this client.');
+            return;
+        }
+        if (!window.paymentApproved) {
+            alert('Payment not yet approved. Cannot download.');
+            return;
+        }
+
+        await generateAndCachePDF();
+        if (cachedPdfBlob) {
+            const currentYear = document.getElementById('inputYear').value;
+            const fileName = `${clientName}_Financial_Report_${currentYear}E.C.pdf`;
+            const link = document.createElement('a');
+            link.href = cachedPdfUrl;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            await incrementDownloadCountAPI(clientName); // Update count on backend
+            updateYearAndCheckDownloadLimit();
+        } else {
+            alert('PDF not generated. Please try again.');
+        }
+    } catch (error) {
+        console.error("Error during download:", error);
+        alert('An error occurred during download.');
+    }
+  });
+
+  printBtn.addEventListener('click', async () => {
+    const clientName = document.getElementById('clientName').value.trim();
+    if (!clientName) {
+        alert('Please enter a client name.');
+        return;
+    }
+
+    try {
+        const downloadCountsResponse = await fetch(`/api/client-downloads?clientName=${encodeURIComponent(clientName)}`);
+        const clientData = await downloadCountsResponse.json();
+        const currentDownloads = clientData.downloads || 0;
+
+        if (currentDownloads >= MAX_DOWNLOADS) {
+            alert('Maximum print limit reached for this client.');
+            return;
+        }
+        if (!window.paymentApproved) {
+            alert('Payment not yet approved. Cannot print.');
+            return;
+        }
+
+        await generateAndCachePDF();
+        if (cachedPdfUrl) {
+            const printWindow = window.open(cachedPdfUrl);
+            printWindow.onload = async () => { // Made async
+                printWindow.print();
+                await incrementDownloadCountAPI(clientName); // Update count on backend
+                updateYearAndCheckDownloadLimit();
+            };
+        } else {
+            alert('PDF not generated. Please try again.');
+        }
+    } catch (error) {
+        console.error("Error during print:", error);
+        alert('An error occurred during print.');
+    }
+  });
+
+  function updateYearAndCheckDownloadLimit() {
+    const inputYear = document.getElementById('inputYear');
+    let currentYear = parseInt(inputYear.value, 10);
+    inputYear.value = currentYear + 1;
+    // After incrementing year, re-check button states for next iteration
+    updateDownloadPrintButtonsState();
+  }
+
+  document.getElementById('addAssetBtn').addEventListener('click', () => {
+    fixedAssets.push({ name: '', value: '' });
+    renderFixedAssetsInputs();
+    if (document.getElementById('statementsForm').classList.contains('active')) renderReportDOM(true, false);
+    attachCommaInputEvents('statementsForm'); // Re-attach for new inputs
+  });
+
+  // Admin approval section (simplified mock for front-end demo)
+  function updatePaymentStatus(message) {
+    document.getElementById('paymentStatusMessage').textContent = message;
+  }
+
+  // --- ADMIN PANEL WITH PASSWORD PROTECTION ---
+  const correctAdminPassword = 'adminpassword123'; // !!! IMPORTANT: In a real app, NEVER hardcode passwords like this !!!
+
+  const adminToggleBtn = document.createElement('button');
+  adminToggleBtn.textContent = 'Toggle Admin Panel';
+  adminToggleBtn.style.position = 'fixed';
+  adminToggleBtn.style.bottom = '10px';
+  adminToggleBtn.style.right = '10px';
+  adminToggleBtn.style.zIndex = '1000'; // Ensure it's above other content
+  document.body.appendChild(adminToggleBtn);
+
+  adminToggleBtn.addEventListener('click', () => {
+    const enteredPassword = prompt("Please enter the admin password:");
+
+    if (enteredPassword === correctAdminPassword) {
+      let adminDiv = document.getElementById('adminApprovalSection');
+      if (!adminDiv) {
+        adminDiv = document.createElement('div');
+        adminDiv.id = 'adminApprovalSection';
+        adminDiv.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 20px;
+            border-radius: 8px;
+            z-index: 1001; /* Above toggle button */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            width: 80%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        `;
+        adminDiv.innerHTML = `
+          <h3>Admin Approval (Mock)</h3>
+          <ul id="pendingReceiptsList" style="list-style-type: none; padding: 0;"></ul>
+          <button id="refreshReceiptsBtn" style="margin-top: 10px;">Refresh Receipts</button>
+          <button id="closeAdminPanelBtn" style="margin-top: 10px; margin-left: 10px; background-color: #dc3545;">Close</button>
+        `;
+        document.body.appendChild(adminDiv);
+        document.getElementById('refreshReceiptsBtn').addEventListener('click', renderPendingReceipts);
+        document.getElementById('closeAdminPanelBtn').addEventListener('click', () => {
+          adminDiv.style.display = 'none';
+        });
+      }
+      if (adminDiv.style.display === 'block') {
+        adminDiv.style.display = 'none';
+      } else {
+        adminDiv.style.display = 'block';
+        renderPendingReceipts();
+      }
+    } else if (enteredPassword !== null) { // User clicked cancel, prompt returns null
+      alert("Incorrect password!");
+    }
+  });
+  // --- END ADMIN PANEL WITH PASSWORD PROTECTION ---
+
+  async function renderPendingReceipts() { // Made async
+    const list = document.getElementById('pendingReceiptsList');
+    if (!list) return;
+    list.innerHTML = 'Loading receipts...';
+    try {
+        const response = await fetch('/api/receipts');
+        const allReceipts = await response.json();
+        const pendingReceipts = allReceipts.filter(r => r.status === 'pending');
+
+        list.innerHTML = ''; // Clear loading message
+        if (pendingReceipts.length === 0) {
+            list.innerHTML = '<li>No pending receipts.</li>';
+        } else {
+            pendingReceipts.forEach(receipt => {
+                const listItem = document.createElement('li');
+                listItem.style.cssText = 'padding: 8px 0; border-bottom: 1px dashed #ddd; display: flex; align-items: center; justify-content: space-between;';
+                listItem.innerHTML = `
+                    <span>ID: ${receipt.id}, Client: ${receipt.client_name}<br>Phone: ${receipt.phone}, File: ${receipt.filename}</span>
+                    <button data-id="${receipt.id}" style="background-color: #28a745; margin-left: 10px; padding: 8px 12px; border-radius: 5px;">Approve</button>
+                `;
+                listItem.querySelector('button').onclick = () => approveReceipt(receipt.id);
+                list.appendChild(listItem);
+            });
+        }
+    } catch (error) {
+        console.error("Error fetching pending receipts:", error);
+        list.innerHTML = '<li>Error loading receipts.</li>';
+    }
+  }
+
+  async function approveReceipt(id) { // Made async
+    try {
+        const response = await fetch('/api/approve-receipt', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            updatePaymentStatus(`Receipt for ${data.receipt.client_name} approved!`);
+            renderPendingReceipts(); // Refresh the list
+            updateDownloadPrintButtonsState(); // Update client-side buttons
+        } else {
+            const errorData = await response.json();
+            updatePaymentStatus(`Error approving receipt: ${errorData.message}`);
+        }
+    } catch (error) {
+        console.error("Error approving receipt:", error);
+        updatePaymentStatus('Network error or failed to approve receipt.');
+    }
+  }
+
+  // Initial checks
+  document.getElementById('clientName').addEventListener('change', updateDownloadPrintButtonsState);
+  document.getElementById('clientName').addEventListener('input', updateDownloadPrintButtonsState);
+  updateDownloadPrintButtonsState(); // Call initially to set button states
+});
+</script>
+</body>
+</html>
